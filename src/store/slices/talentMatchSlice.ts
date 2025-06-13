@@ -1,28 +1,6 @@
-import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
-import { mockCandidates } from '../../data/mockCandidates';
 
-export interface Candidate {
-  id: string;
-  name: string;
-  avatar: string;
-  title: string;
-  location: string;
-  timezone: string;
-  hourlyRate: number;
-  rating: number;
-  badges: string[];
-  skills: {
-    codeQuality: number;
-    performance: number;
-    communication: number;
-    reliability: number;
-    innovation: number;
-  };
-  technicalFit: number;
-  completedProjects: number;
-  responseTime: string;
-  languages: string[];
-}
+import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
+import { mockCandidates, Candidate } from '../../data/mockCandidates';
 
 interface Filters {
   techStack: string[];
@@ -37,6 +15,7 @@ interface TalentMatchState {
   loading: boolean;
   error: string | null;
   filters: Filters;
+  challengeLoading: Record<string, boolean>;
 }
 
 const initialState: TalentMatchState = {
@@ -50,6 +29,7 @@ const initialState: TalentMatchState = {
     maxRate: 200,
     minRating: 0,
   },
+  challengeLoading: {},
 };
 
 export const fetchCandidates = createAsyncThunk(
@@ -58,6 +38,15 @@ export const fetchCandidates = createAsyncThunk(
     // Simulate API delay
     await new Promise(resolve => setTimeout(resolve, 800));
     return mockCandidates;
+  }
+);
+
+export const sendChallengeInvite = createAsyncThunk(
+  'talentMatch/sendChallengeInvite',
+  async (candidateId: string) => {
+    // Simulate API delay
+    await new Promise(resolve => setTimeout(resolve, 1000));
+    return candidateId;
   }
 );
 
@@ -81,8 +70,8 @@ const filterCandidates = (candidates: Candidate[], filters: Filters): Candidate[
       return false;
     }
 
-    // Rating filter
-    if (candidate.rating < filters.minRating) {
+    // Rating filter - using technicalFit as rating equivalent
+    if (candidate.technicalFit < filters.minRating) {
       return false;
     }
 
@@ -113,6 +102,15 @@ const talentMatchSlice = createSlice({
       .addCase(fetchCandidates.rejected, (state, action) => {
         state.loading = false;
         state.error = action.error.message || 'Failed to fetch candidates';
+      })
+      .addCase(sendChallengeInvite.pending, (state, action) => {
+        state.challengeLoading[action.meta.arg] = true;
+      })
+      .addCase(sendChallengeInvite.fulfilled, (state, action) => {
+        state.challengeLoading[action.payload] = false;
+      })
+      .addCase(sendChallengeInvite.rejected, (state, action) => {
+        state.challengeLoading[action.meta.arg] = false;
       });
   },
 });
