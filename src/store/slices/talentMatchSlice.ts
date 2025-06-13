@@ -1,28 +1,52 @@
-
 import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
-import { Candidate, mockCandidates } from '../../data/mockCandidates';
+import { mockCandidates } from '../../data/mockCandidates';
+
+export interface Candidate {
+  id: string;
+  name: string;
+  avatar: string;
+  title: string;
+  location: string;
+  timezone: string;
+  hourlyRate: number;
+  rating: number;
+  badges: string[];
+  skills: {
+    codeQuality: number;
+    performance: number;
+    communication: number;
+    reliability: number;
+    innovation: number;
+  };
+  technicalFit: number;
+  completedProjects: number;
+  responseTime: string;
+  languages: string[];
+}
+
+interface Filters {
+  techStack: string[];
+  timezone: string;
+  maxRate: number;
+  minRating: number;
+}
 
 interface TalentMatchState {
   candidates: Candidate[];
   filteredCandidates: Candidate[];
   loading: boolean;
-  challengeLoading: { [key: string]: boolean };
-  filters: {
-    techStack: string[];
-    timezone: string;
-    maxRate: number;
-    minRating: number;
-  };
+  error: string | null;
+  filters: Filters;
 }
 
 const initialState: TalentMatchState = {
   candidates: [],
   filteredCandidates: [],
   loading: false,
-  challengeLoading: {},
+  error: null,
   filters: {
     techStack: [],
-    timezone: '',
+    timezone: 'any',
     maxRate: 200,
     minRating: 0,
   },
@@ -31,64 +55,67 @@ const initialState: TalentMatchState = {
 export const fetchCandidates = createAsyncThunk(
   'talentMatch/fetchCandidates',
   async () => {
-    // Simulate API call
+    // Simulate API delay
     await new Promise(resolve => setTimeout(resolve, 800));
     return mockCandidates;
   }
 );
 
-export const sendChallengeInvite = createAsyncThunk(
-  'talentMatch/sendChallengeInvite',
-  async (candidateId: string) => {
-    // Simulate API call
-    await new Promise(resolve => setTimeout(resolve, 800));
-    return candidateId;
-  }
-);
+const filterCandidates = (candidates: Candidate[], filters: Filters): Candidate[] => {
+  return candidates.filter(candidate => {
+    // Tech stack filter
+    if (filters.techStack.length > 0) {
+      const hasMatchingTech = filters.techStack.some(tech => 
+        candidate.badges.some(badge => badge.toLowerCase().includes(tech.toLowerCase()))
+      );
+      if (!hasMatchingTech) return false;
+    }
+
+    // Timezone filter
+    if (filters.timezone !== 'any' && candidate.timezone !== filters.timezone) {
+      return false;
+    }
+
+    // Rate filter
+    if (candidate.hourlyRate > filters.maxRate) {
+      return false;
+    }
+
+    // Rating filter
+    if (candidate.rating < filters.minRating) {
+      return false;
+    }
+
+    return true;
+  });
+};
 
 const talentMatchSlice = createSlice({
   name: 'talentMatch',
   initialState,
   reducers: {
-    setFilters: (state, action: PayloadAction<Partial<typeof initialState.filters>>) => {
+    setFilters: (state, action: PayloadAction<Partial<Filters>>) => {
       state.filters = { ...state.filters, ...action.payload };
-      // Apply filters
-      state.filteredCandidates = state.candidates.filter(candidate => {
-        const techStackMatch = state.filters.techStack.length === 0 || 
-          state.filters.techStack.some(tech => candidate.badges.includes(tech));
-        const rateMatch = candidate.hourlyRate <= state.filters.maxRate;
-        const ratingMatch = candidate.technicalFit >= state.filters.minRating;
-        return techStackMatch && rateMatch && ratingMatch;
-      });
-    },
-    setChallengeLoading: (state, action: PayloadAction<{ candidateId: string; loading: boolean }>) => {
-      state.challengeLoading[action.payload.candidateId] = action.payload.loading;
+      state.filteredCandidates = filterCandidates(state.candidates, state.filters);
     },
   },
   extraReducers: (builder) => {
     builder
       .addCase(fetchCandidates.pending, (state) => {
         state.loading = true;
+        state.error = null;
       })
       .addCase(fetchCandidates.fulfilled, (state, action) => {
         state.loading = false;
         state.candidates = action.payload;
-        state.filteredCandidates = action.payload;
+        state.filteredCandidates = filterCandidates(action.payload, state.filters);
       })
-      .addCase(fetchCandidates.rejected, (state) => {
+      .addCase(fetchCandidates.rejected, (state, action) => {
         state.loading = false;
-      })
-      .addCase(sendChallengeInvite.pending, (state, action) => {
-        state.challengeLoading[action.meta.arg] = true;
-      })
-      .addCase(sendChallengeInvite.fulfilled, (state, action) => {
-        state.challengeLoading[action.payload] = false;
-      })
-      .addCase(sendChallengeInvite.rejected, (state, action) => {
-        state.challengeLoading[action.meta.arg] = false;
+        state.error = action.error.message || 'Failed to fetch candidates';
       });
   },
 });
 
-export const { setFilters, setChallengeLoading } = talentMatchSlice.actions;
+export const { setFilters } = talentMatchSlice.actions;
 export default talentMatchSlice.reducer;

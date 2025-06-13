@@ -25,7 +25,7 @@ const FilterDrawer: React.FC<FilterDrawerProps> = ({ isOpen, onClose }) => {
   ];
 
   const timezones = [
-    { label: '不限', value: '' },
+    { label: '不限', value: 'any' },
     { label: 'UTC-8 (美西)', value: 'UTC-8' },
     { label: 'UTC-5 (美东)', value: 'UTC-5' },
     { label: 'UTC+0 (欧洲)', value: 'UTC+0' },
@@ -43,7 +43,7 @@ const FilterDrawer: React.FC<FilterDrawerProps> = ({ isOpen, onClose }) => {
   const resetFilters = () => {
     dispatch(setFilters({
       techStack: [],
-      timezone: '',
+      timezone: 'any',
       maxRate: 200,
       minRating: 0,
     }));
@@ -81,7 +81,7 @@ const FilterDrawer: React.FC<FilterDrawerProps> = ({ isOpen, onClose }) => {
           <div>
             <Label className="text-base font-medium">时区</Label>
             <Select 
-              value={filters.timezone} 
+              value={filters.timezone || 'any'} 
               onValueChange={(value) => dispatch(setFilters({ timezone: value }))}
             >
               <SelectTrigger className="mt-2">
