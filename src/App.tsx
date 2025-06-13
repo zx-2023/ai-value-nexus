@@ -11,6 +11,8 @@ import Index from "./pages/Index";
 import TalentMatchPage from './pages/talent-match/TalentMatchPage';
 import AIStudioPage from './pages/ai-studio/AIStudioPage';
 import SandboxIDEPage from './pages/sandbox-ide/SandboxIDEPage';
+import ProjectConsolePage from './pages/project-console/ProjectConsolePage';
+import DeveloperWorkstationPage from './pages/developer-workstation/DeveloperWorkstationPage';
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -29,6 +31,8 @@ const App = () => (
               <Route path="/ai-studio" element={<AIStudioPage />} />
               <Route path="/talent-match" element={<TalentMatchPage />} />
               <Route path="/sandbox" element={<SandboxIDEPage />} />
+              <Route path="/project-console" element={<ProjectConsolePage />} />
+              <Route path="/developer-workstation" element={<DeveloperWorkstationPage />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
           </div>

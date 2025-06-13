@@ -12,6 +12,7 @@ interface User {
 interface AuthState {
   user: User | null;
   isAuthenticated: boolean;
+  currentRole: 'enterprise' | 'developer';
 }
 
 const initialState: AuthState = {
@@ -23,6 +24,7 @@ const initialState: AuthState = {
     avatar: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face'
   },
   isAuthenticated: true,
+  currentRole: 'enterprise',
 };
 
 const authSlice = createSlice({
@@ -32,13 +34,18 @@ const authSlice = createSlice({
     login: (state, action: PayloadAction<User>) => {
       state.user = action.payload;
       state.isAuthenticated = true;
+      state.currentRole = action.payload.role;
     },
     logout: (state) => {
       state.user = null;
       state.isAuthenticated = false;
+      state.currentRole = 'enterprise';
+    },
+    switchRole: (state, action: PayloadAction<'enterprise' | 'developer'>) => {
+      state.currentRole = action.payload;
     },
   },
 });
 
-export const { login, logout } = authSlice.actions;
+export const { login, logout, switchRole } = authSlice.actions;
 export default authSlice.reducer;
