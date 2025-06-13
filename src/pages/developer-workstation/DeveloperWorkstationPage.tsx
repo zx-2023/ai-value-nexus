@@ -7,6 +7,7 @@ import TaskDashboard from './components/TaskDashboard';
 import AgentPanel from './components/AgentPanel';
 import CommunicationPanel from './components/CommunicationPanel';
 import EarningsPanel from './components/EarningsPanel';
+import ResumeBuilder from './components/ResumeBuilder';
 
 const DeveloperWorkstationPage = () => {
   const dispatch = useDispatch<AppDispatch>();
@@ -36,13 +37,14 @@ const DeveloperWorkstationPage = () => {
         </div>
 
         <div className="grid grid-cols-12 gap-6">
-          {/* Left Column - Tasks and Agent */}
+          {/* Left Column - Main Content */}
           <div className="col-span-12 lg:col-span-8 space-y-6">
             <TaskDashboard />
             <AgentPanel />
+            <ResumeBuilder />
           </div>
 
-          {/* Right Column - Communication and Earnings */}
+          {/* Right Column - Sidebar */}
           <div className="col-span-12 lg:col-span-4 space-y-6">
             <CommunicationPanel />
             <EarningsPanel />

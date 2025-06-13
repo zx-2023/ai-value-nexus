@@ -7,6 +7,9 @@ import ProjectOverview from './components/ProjectOverview';
 import ProjectList from './components/ProjectList';
 import BillingPanel from './components/BillingPanel';
 import ProjectDetails from './components/ProjectDetails';
+import CommunicationPanel from './components/CommunicationPanel';
+import AcceptancePanel from './components/AcceptancePanel';
+import NotificationCenter from './components/NotificationCenter';
 
 const ProjectConsolePage = () => {
   const dispatch = useDispatch<AppDispatch>();
@@ -38,13 +41,22 @@ const ProjectConsolePage = () => {
         <ProjectOverview />
 
         <div className="grid grid-cols-12 gap-6 mt-6">
-          {/* Project List - 8/12 columns */}
-          <div className="col-span-12 lg:col-span-8">
+          {/* Left Column - Main Content */}
+          <div className="col-span-12 lg:col-span-8 space-y-6">
             {selectedProject ? <ProjectDetails /> : <ProjectList />}
+            
+            {/* Communication and Acceptance Panels */}
+            {selectedProject && (
+              <>
+                <CommunicationPanel />
+                <AcceptancePanel />
+              </>
+            )}
           </div>
 
-          {/* Billing Panel - 4/12 columns */}
-          <div className="col-span-12 lg:col-span-4">
+          {/* Right Column - Sidebar */}
+          <div className="col-span-12 lg:col-span-4 space-y-6">
+            <NotificationCenter />
             <BillingPanel />
           </div>
         </div>
