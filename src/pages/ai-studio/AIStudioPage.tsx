@@ -1,10 +1,14 @@
+
 import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState, AppDispatch } from '../../store';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import SRDPreview from './components/SRDPreview';
 import VersionHistory from './components/VersionHistory';
 import BudgetTimeline from './components/BudgetTimeline';
 import EnterpriseFloatingChat from './components/EnterpriseFloatingChat';
+import SRDTemplateHub from './components/SRDTemplateHub';
+import { FileText, History, LayoutTemplate } from 'lucide-react';
 
 const AIStudioPage = () => {
   const { currentSRD } = useSelector((state: RootState) => state.aiStudio);
@@ -33,17 +37,40 @@ const AIStudioPage = () => {
           timeline={currentSRD.timelineWeeks}
         />
 
-        {/* Main Content Grid */}
-        <div className="grid grid-cols-12 gap-6 mt-8">
-          {/* SRD Preview - Main Content Area (8/12) */}
-          <div className="col-span-12 lg:col-span-8">
-            <SRDPreview />
-          </div>
+        {/* Main Content with Tabs */}
+        <div className="mt-8">
+          <Tabs defaultValue="srd-preview" className="space-y-6">
+            <TabsList className="grid w-full grid-cols-3">
+              <TabsTrigger value="srd-preview" className="flex items-center gap-2">
+                <FileText className="h-4 w-4" />
+                需求文档
+              </TabsTrigger>
+              <TabsTrigger value="template-hub" className="flex items-center gap-2">
+                <LayoutTemplate className="h-4 w-4" />
+                模板中心
+              </TabsTrigger>
+              <TabsTrigger value="version-history" className="flex items-center gap-2">
+                <History className="h-4 w-4" />
+                版本历史
+              </TabsTrigger>
+            </TabsList>
 
-          {/* Version History - Sidebar (4/12) */}
-          <div className="col-span-12 lg:col-span-4">
-            <VersionHistory />
-          </div>
+            <TabsContent value="srd-preview">
+              <div className="grid grid-cols-12 gap-6">
+                <div className="col-span-12">
+                  <SRDPreview />
+                </div>
+              </div>
+            </TabsContent>
+
+            <TabsContent value="template-hub">
+              <SRDTemplateHub />
+            </TabsContent>
+
+            <TabsContent value="version-history">
+              <VersionHistory />
+            </TabsContent>
+          </Tabs>
         </div>
       </div>
     </div>
